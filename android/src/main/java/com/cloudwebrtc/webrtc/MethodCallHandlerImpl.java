@@ -794,6 +794,7 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
         String videoTrackId = call.argument("videoTrackId");
 
         Log.d(TAG, "testFrame: " + videoTrackId);
+        Log.d(TAG, "getLocalTrack: " + getLocalTrack(videoTrackId));
         break;
       }
       case "getLocalDescription": {
