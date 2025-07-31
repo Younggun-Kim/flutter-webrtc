@@ -808,7 +808,8 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
               customCapture = null;
             }
 
-            customCapture = new CustomCapture((VideoTrack) videoTrack);
+            MethodChannel methodChannel = new MethodChannel(messenger, "FlutterWebRTC.Method");
+            customCapture = new CustomCapture((VideoTrack) videoTrack, methodChannel);
           } else {
             resultError("testFrame", "It's not video track", result);
           }
