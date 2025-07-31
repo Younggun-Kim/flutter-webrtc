@@ -33,8 +33,9 @@ public class CustomCapture implements VideoSink {
             i420Buffer.release();
             videoFrame.release();
 
-            callback.success(null);
+//            callback.success(null);
         } catch (Exception e) {
+            videoTrack.removeSink(this);
             callback.error("CustomCaptureException", e.getLocalizedMessage(), e);
         }
 
