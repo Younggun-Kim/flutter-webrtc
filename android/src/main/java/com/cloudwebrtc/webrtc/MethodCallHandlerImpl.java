@@ -789,8 +789,8 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
         }
         break;
       }
+      // Custom: testFrame
       case "testFrame": {
-
         String videoTrackId = call.argument("videoTrackId");
         if(videoTrackId != null) {
           Log.d(TAG, "testFrame: " + videoTrackId);
@@ -798,7 +798,8 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
           MediaStreamTrack track = getTrackForId(videoTrackId, null);
 
           if (track instanceof VideoTrack) {
-            Log.d(TAG, "getLocalTrack: " + track);
+            Log.d(TAG, "getTrackForId: " + track);
+            new CustomCapture((VideoTrack) videoTrack, result);
           } else {
             resultError("testFrame", "It's not video track", result);
           }
