@@ -17,6 +17,7 @@ public class CustomCapture implements VideoSink {
     public CustomCapture(VideoTrack videoTrack, MethodChannel.Result callback) {
         this.videoTrack = videoTrack;
         this.callback = callback;
+
         videoTrack.addSink(this);
     }
 
