@@ -799,7 +799,7 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
 
           if (track instanceof VideoTrack) {
             Log.d(TAG, "getTrackForId: " + track);
-            new CustomCapture((VideoTrack) videoTrack, result);
+            new CustomCapture((VideoTrack) track, result);
           } else {
             resultError("testFrame", "It's not video track", result);
           }
