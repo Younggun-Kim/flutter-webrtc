@@ -6,6 +6,8 @@ import org.webrtc.VideoFrame;
 import org.webrtc.VideoSink;
 import org.webrtc.VideoTrack;
 
+import io.flutter.plugin.common.MethodChannel;
+
 public class CustomCapture implements VideoSink {
 
     private final String tag = "CustomCapture";
