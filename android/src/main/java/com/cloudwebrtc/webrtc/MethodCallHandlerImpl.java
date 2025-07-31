@@ -802,7 +802,12 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
 
           if (videoTrack instanceof VideoTrack) {
             Log.d(TAG, "getTrackForId: " + videoTrack);
-            customCapture.dispose();
+
+            if(customCapture != null) {
+              customCapture.dispose();
+              customCapture = null;
+            }
+
             customCapture = new CustomCapture((VideoTrack) videoTrack);
           } else {
             resultError("testFrame", "It's not video track", result);
