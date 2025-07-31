@@ -789,6 +789,12 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
         }
         break;
       }
+      case "testFrame": {
+        String videoTrackId = call.argument("videoTrackId");
+
+        result.success("testFrame success", videoTrackId);
+        break;
+      }
       case "getLocalDescription": {
         String peerConnectionId = call.argument("peerConnectionId");
         PeerConnection peerConnection = getPeerConnection(peerConnectionId);
