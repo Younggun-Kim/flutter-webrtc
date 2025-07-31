@@ -133,6 +133,8 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
 
   public AudioProcessingController audioProcessingController;
 
+  private CustomCapture customCapture;
+
   MethodCallHandlerImpl(Context context, BinaryMessenger messenger, TextureRegistry textureRegistry) {
     this.context = context;
     this.textures = textureRegistry;
@@ -790,22 +792,30 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
         break;
       }
       // Custom: testFrame
-      case "testFrame": {
+      case "startCustomCapture": {
         String videoTrackId = call.argument("videoTrackId");
+
         if(videoTrackId != null) {
           Log.d(TAG, "testFrame: " + videoTrackId);
 
-          MediaStreamTrack track = getTrackForId(videoTrackId, null);
+          MediaStreamTrack videoTrack = getTrackForId(videoTrackId, null);
 
-          if (track instanceof VideoTrack) {
-            Log.d(TAG, "getTrackForId: " + track);
-            new CustomCapture((VideoTrack) track, result);
+          if (videoTrack instanceof VideoTrack) {
+            Log.d(TAG, "getTrackForId: " + videoTrack);
+            customCapture.dispose();
+            customCapture = new CustomCapture((VideoTrack) videoTrack);
           } else {
             resultError("testFrame", "It's not video track", result);
           }
         } else {
           resultError("testFrame", "Track is null", result);
         }
+
+        break;
+      }
+      case "stopCustomCapture": {
+        customCapture.dispose();
+        customCapture = null;
 
         break;
       }

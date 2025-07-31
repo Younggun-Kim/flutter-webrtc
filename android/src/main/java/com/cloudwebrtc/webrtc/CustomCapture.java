@@ -12,11 +12,9 @@ public class CustomCapture implements VideoSink {
 
     private final String tag = "CustomCapture";
     private final VideoTrack videoTrack;
-    private final MethodChannel.Result callback;
 
-    public CustomCapture(VideoTrack videoTrack, MethodChannel.Result callback) {
+    public CustomCapture(VideoTrack videoTrack) {
         this.videoTrack = videoTrack;
-        this.callback = callback;
 
         videoTrack.addSink(this);
     }
@@ -30,14 +28,17 @@ public class CustomCapture implements VideoSink {
             VideoFrame.I420Buffer i420Buffer = buffer.toI420();
 
             Log.i(tag, "420Buffer" + i420Buffer.toString());
+
             i420Buffer.release();
             videoFrame.release();
 
-//            callback.success(null);
         } catch (Exception e) {
-            videoTrack.removeSink(this);
-            callback.error("CustomCaptureException", e.getLocalizedMessage(), e);
+            dispose();
+            Log.e(tag, "onFrame Error: ", e);
         }
+    }
 
+    public void dispose() {
+        videoTrack.removeSink(this);
     }
 }
