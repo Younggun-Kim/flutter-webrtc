@@ -792,9 +792,22 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
       case "testFrame": {
 
         String videoTrackId = call.argument("videoTrackId");
+        if(videoTrackId != null) {
+          Log.d(TAG, "testFrame: " + videoTrackId);
 
-        Log.d(TAG, "testFrame: " + videoTrackId);
-        Log.d(TAG, "getLocalTrack: " + getLocalTrack(videoTrackId));
+          MediaStreamTrack track = getLocalTrack(videoTrackId);
+
+          if (track instanceof VideoTrack) {
+            Log.d(TAG, "getLocalTrack: " + getLocalTrack(videoTrackId));
+
+            new FrameCapturer((VideoTrack) track, new File(path), result);
+          } else {
+            resultError("testFrame", "It's not video track", result);
+          }
+        } else {
+          resultError("testFrame", "Track is null", result);
+        }
+
         break;
       }
       case "getLocalDescription": {
