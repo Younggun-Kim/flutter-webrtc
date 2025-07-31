@@ -795,10 +795,10 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
         if(videoTrackId != null) {
           Log.d(TAG, "testFrame: " + videoTrackId);
 
-          MediaStreamTrack track = getLocalTrack(videoTrackId);
+          MediaStreamTrack track = getTrackForId(videoTrackId, null);
 
           if (track instanceof VideoTrack) {
-            Log.d(TAG, "getLocalTrack: " + getLocalTrack(videoTrackId));
+            Log.d(TAG, "getLocalTrack: " + track);
           } else {
             resultError("testFrame", "It's not video track", result);
           }
