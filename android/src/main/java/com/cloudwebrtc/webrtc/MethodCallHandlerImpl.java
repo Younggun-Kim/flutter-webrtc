@@ -161,7 +161,7 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
     mPeerConnectionObservers.clear();
   }
   private void initialize(boolean bypassVoiceProcessing, int networkIgnoreMask, boolean forceSWCodec, List<String> forceSWCodecList,
-  @Nullable ConstraintsMap androidAudioConfiguration) {
+                          @Nullable ConstraintsMap androidAudioConfiguration) {
     if (mFactory != null) {
       return;
     }
@@ -186,14 +186,14 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
 
       // Warn if one is provided without the other.
       if (usageType == null ^ contentType == null) {
-          Log.w(TAG, "usageType and contentType must both be provided!");
+        Log.w(TAG, "usageType and contentType must both be provided!");
       }
 
       if (usageType != null && contentType != null) {
-          audioAttributes = new AudioAttributes.Builder()
-                  .setUsage(usageType)
-                  .setContentType(contentType)
-                  .build();
+        audioAttributes = new AudioAttributes.Builder()
+                .setUsage(usageType)
+                .setContentType(contentType)
+                .build();
       }
     }
     JavaAudioDeviceModule.Builder audioDeviceModuleBuilder = JavaAudioDeviceModule.builder(context);
@@ -203,16 +203,16 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
 
     if(bypassVoiceProcessing) {
       audioDeviceModuleBuilder.setUseHardwareAcousticEchoCanceler(false)
-                        .setUseHardwareNoiseSuppressor(false)
-                        .setUseStereoInput(true)
-                        .setUseStereoOutput(true)
-                        .setAudioSource(MediaRecorder.AudioSource.MIC);
+              .setUseHardwareNoiseSuppressor(false)
+              .setUseStereoInput(true)
+              .setUseStereoOutput(true)
+              .setAudioSource(MediaRecorder.AudioSource.MIC);
     } else {
       boolean useHardwareAudioProcessing = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q;
       boolean useLowLatency = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
       audioDeviceModuleBuilder.setUseHardwareAcousticEchoCanceler(useHardwareAudioProcessing)
-                        .setUseLowLatency(useLowLatency)
-                        .setUseHardwareNoiseSuppressor(useHardwareAudioProcessing);
+              .setUseLowLatency(useLowLatency)
+              .setUseHardwareNoiseSuppressor(useHardwareAudioProcessing);
     }
 
     audioDeviceModuleBuilder.setSamplesReadyCallback(recordSamplesReadyCallbackAdapter);
@@ -238,9 +238,9 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
     audioDeviceModule = audioDeviceModuleBuilder.createAudioDeviceModule();
 
     if(!bypassVoiceProcessing) {
-       if(JavaAudioDeviceModule.isBuiltInNoiseSuppressorSupported()) {
-         audioDeviceModule.setNoiseSuppressorEnabled(true);
-       }
+      if(JavaAudioDeviceModule.isBuiltInNoiseSuppressorSupported()) {
+        audioDeviceModule.setNoiseSuppressorEnabled(true);
+      }
     }
 
 
@@ -336,7 +336,7 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
         ConstraintsMap androidAudioConfiguration = null;
         if (constraintsMap.hasKey("androidAudioConfiguration")
                 && constraintsMap.getType("androidAudioConfiguration") == ObjectType.Map) {
-            androidAudioConfiguration = constraintsMap.getMap("androidAudioConfiguration");
+          androidAudioConfiguration = constraintsMap.getMap("androidAudioConfiguration");
         }
         boolean enableBypassVoiceProcessing = false;
         if(options.get("bypassVoiceProcessing") != null) {
@@ -497,8 +497,8 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
         if (isBinary) {
           byteBuffer = ByteBuffer.wrap(call.argument("data"));
         } else {
-            String data = call.argument("data");
-            byteBuffer = ByteBuffer.wrap(data.getBytes(StandardCharsets.UTF_8));
+          String data = call.argument("data");
+          byteBuffer = ByteBuffer.wrap(data.getBytes(StandardCharsets.UTF_8));
         }
         dataChannelSend(peerConnectionId, dataChannelId, byteBuffer, isBinary);
         result.success(null);
@@ -790,8 +790,10 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
         break;
       }
       case "testFrame": {
+
         String videoTrackId = call.argument("videoTrackId");
-        result.success("testFrame success: " + videoTrackId);
+
+        Log.d(TAG, "testFrame: " + videoTrackId);
         break;
       }
       case "getLocalDescription": {
@@ -996,8 +998,8 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
         break;
       }
       case "getIceConnectionState": {
-       String peerConnectionId = call.argument("peerConnectionId");
-       PeerConnection pc = getPeerConnection(peerConnectionId);
+        String peerConnectionId = call.argument("peerConnectionId");
+        PeerConnection pc = getPeerConnection(peerConnectionId);
         if (pc == null) {
           resultError("getIceConnectionState", "peerConnection is null", result);
         } else {
@@ -1916,9 +1918,9 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
         sdpMLineIndex = candidateMap.getInt("sdpMLineIndex");
       }
       IceCandidate candidate = new IceCandidate(
-          candidateMap.getString("sdpMid"),
-          sdpMLineIndex,
-          candidateMap.getString("candidate"));
+              candidateMap.getString("sdpMid"),
+              sdpMLineIndex,
+              candidateMap.getString("candidate"));
       res = peerConnection.addIceCandidate(candidate);
     } else {
       resultError("peerConnectionAddICECandidate", "peerConnection is null", result);
@@ -2088,4 +2090,210 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
     if (pco == null || pco.getPeerConnection() == null) {
       resultError("addTrack", "peerConnection is null", result);
     } else {
-      <truncated__content/>
+      pco.addTrack(track.track, streamIds, result);
+    }
+  }
+
+  public void removeTrack(String peerConnectionId, String senderId, Result result) {
+    PeerConnectionObserver pco = mPeerConnectionObservers.get(peerConnectionId);
+    if (pco == null || pco.getPeerConnection() == null) {
+      resultError("removeTrack", "peerConnection is null", result);
+    } else {
+      pco.removeTrack(senderId, result);
+    }
+  }
+
+  public void addTransceiver(String peerConnectionId, String trackId, Map<String, Object> transceiverInit,
+                             Result result) {
+    PeerConnectionObserver pco = mPeerConnectionObservers.get(peerConnectionId);
+    LocalTrack track = localTracks.get(trackId);
+    if (track == null) {
+      resultError("addTransceiver", "track is null", result);
+      return;
+    }
+    if (pco == null || pco.getPeerConnection() == null) {
+      resultError("addTransceiver", "peerConnection is null", result);
+    } else {
+      pco.addTransceiver(track.track, transceiverInit, result);
+    }
+  }
+
+  public void addTransceiverOfType(String peerConnectionId, String mediaType, Map<String, Object> transceiverInit,
+                                   Result result) {
+    PeerConnectionObserver pco = mPeerConnectionObservers.get(peerConnectionId);
+    if (pco == null || pco.getPeerConnection() == null) {
+      resultError("addTransceiverOfType", "peerConnection is null", result);
+    } else {
+      pco.addTransceiverOfType(mediaType, transceiverInit, result);
+    }
+  }
+
+  public void rtpTransceiverSetDirection(String peerConnectionId, String direction, String transceiverId, Result result) {
+    PeerConnectionObserver pco = mPeerConnectionObservers.get(peerConnectionId);
+    if (pco == null || pco.getPeerConnection() == null) {
+      resultError("rtpTransceiverSetDirection", "peerConnection is null", result);
+    } else {
+      pco.rtpTransceiverSetDirection(direction, transceiverId, result);
+    }
+  }
+
+  public void rtpTransceiverSetCodecPreferences(String peerConnectionId, String transceiverId, List<Map<String, Object>> codecs, Result result) {
+    PeerConnectionObserver pco = mPeerConnectionObservers.get(peerConnectionId);
+    if (pco == null || pco.getPeerConnection() == null) {
+      resultError("setCodecPreferences", "peerConnection is null", result);
+    } else {
+      pco.rtpTransceiverSetCodecPreferences(transceiverId, codecs, result);
+    }
+  }
+
+  public void rtpTransceiverGetDirection(String peerConnectionId, String transceiverId, Result result) {
+    PeerConnectionObserver pco = mPeerConnectionObservers.get(peerConnectionId);
+    if (pco == null || pco.getPeerConnection() == null) {
+      resultError("rtpTransceiverSetDirection", "peerConnection is null", result);
+    } else {
+      pco.rtpTransceiverGetDirection(transceiverId, result);
+    }
+  }
+
+  public void rtpTransceiverGetCurrentDirection(String peerConnectionId, String transceiverId, Result result) {
+    PeerConnectionObserver pco = mPeerConnectionObservers.get(peerConnectionId);
+    if (pco == null || pco.getPeerConnection() == null) {
+      resultError("rtpTransceiverSetDirection", "peerConnection is null", result);
+    } else {
+      pco.rtpTransceiverGetCurrentDirection(transceiverId, result);
+    }
+  }
+
+  public void rtpTransceiverStop(String peerConnectionId, String transceiverId, Result result) {
+    PeerConnectionObserver pco = mPeerConnectionObservers.get(peerConnectionId);
+    if (pco == null || pco.getPeerConnection() == null) {
+      resultError("rtpTransceiverStop", "peerConnection is null", result);
+    } else {
+      pco.rtpTransceiverStop(transceiverId, result);
+    }
+  }
+
+  public void rtpSenderSetParameters(String peerConnectionId, String rtpSenderId, Map<String, Object> parameters, Result result) {
+    PeerConnectionObserver pco = mPeerConnectionObservers.get(peerConnectionId);
+    if (pco == null || pco.getPeerConnection() == null) {
+      resultError("rtpSenderSetParameters", "peerConnection is null", result);
+    } else {
+      pco.rtpSenderSetParameters(rtpSenderId, parameters, result);
+    }
+  }
+
+  public void getSenders(String peerConnectionId, Result result) {
+    PeerConnectionObserver pco = mPeerConnectionObservers.get(peerConnectionId);
+    if (pco == null || pco.getPeerConnection() == null) {
+      resultError("getSenders", "peerConnection is null", result);
+    } else {
+      pco.getSenders(result);
+    }
+  }
+
+  public void getReceivers(String peerConnectionId, Result result) {
+    PeerConnectionObserver pco = mPeerConnectionObservers.get(peerConnectionId);
+    if (pco == null || pco.getPeerConnection() == null) {
+      resultError("getReceivers", "peerConnection is null", result);
+    } else {
+      pco.getReceivers(result);
+    }
+  }
+
+  public void getTransceivers(String peerConnectionId, Result result) {
+    PeerConnectionObserver pco = mPeerConnectionObservers.get(peerConnectionId);
+    if (pco == null || pco.getPeerConnection() == null) {
+      resultError("getTransceivers", "peerConnection is null", result);
+    } else {
+      pco.getTransceivers(result);
+    }
+  }
+
+  public void rtpSenderSetTrack(String peerConnectionId, String rtpSenderId, String trackId, boolean replace, Result result) {
+    PeerConnectionObserver pco = mPeerConnectionObservers.get(peerConnectionId);
+    if (pco == null || pco.getPeerConnection() == null) {
+      resultError("rtpSenderSetTrack", "peerConnection is null", result);
+    } else {
+      MediaStreamTrack mediaStreamTrack = null;
+      LocalTrack track = localTracks.get(trackId);
+      if (trackId.length() > 0) {
+        if (track == null) {
+          resultError("rtpSenderSetTrack", "track is null", result);
+          return;
+        }
+      }
+
+      if(track != null) {
+        mediaStreamTrack = track.track;
+      }
+      pco.rtpSenderSetTrack(rtpSenderId, mediaStreamTrack, result, replace);
+    }
+  }
+
+  public void rtpSenderSetStreams(String peerConnectionId, String rtpSenderId, List<String> streamIds, Result result) {
+    PeerConnectionObserver pco = mPeerConnectionObservers.get(peerConnectionId);
+    if (pco == null || pco.getPeerConnection() == null) {
+      resultError("rtpSenderSetStreams", "peerConnection is null", result);
+    } else {
+      pco.rtpSenderSetStreams(rtpSenderId, streamIds, result);
+    }
+  }
+
+
+  public void reStartCamera() {
+    if (null == getUserMediaImpl) {
+      return;
+    }
+    getUserMediaImpl.reStartCamera(new GetUserMediaImpl.IsCameraEnabled() {
+      @Override
+      public boolean isEnabled(String id) {
+        if (!localTracks.containsKey(id)) {
+          return false;
+        }
+        return localTracks.get(id).enabled();
+      }
+    });
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.M)
+  void requestPermissions(
+          final ArrayList<String> permissions,
+          final Callback successCallback,
+          final Callback errorCallback) {
+    PermissionUtils.Callback callback =
+            (permissions_, grantResults) -> {
+              List<String> grantedPermissions = new ArrayList<>();
+              List<String> deniedPermissions = new ArrayList<>();
+
+              for (int i = 0; i < permissions_.length; ++i) {
+                String permission = permissions_[i];
+                int grantResult = grantResults[i];
+
+                if (grantResult == PackageManager.PERMISSION_GRANTED) {
+                  grantedPermissions.add(permission);
+                } else {
+                  deniedPermissions.add(permission);
+                }
+              }
+
+              // Success means that all requested permissions were granted.
+              for (String p : permissions) {
+                if (!grantedPermissions.contains(p)) {
+                  // According to step 6 of the getUserMedia() algorithm
+                  // "if the result is denied, jump to the step Permission
+                  // Failure."
+                  errorCallback.invoke(deniedPermissions);
+                  return;
+                }
+              }
+              successCallback.invoke(grantedPermissions);
+            };
+
+    final Activity activity = getActivity();
+    final Context context = getApplicationContext();
+    PermissionUtils.requestPermissions(
+            context,
+            activity,
+            permissions.toArray(new String[permissions.size()]), callback);
+  }
+}
