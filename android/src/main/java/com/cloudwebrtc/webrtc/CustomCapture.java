@@ -10,34 +10,14 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.flutter.plugin.common.EventChannel;
-import io.flutter.plugin.common.MethodChannel;
-
-
 public class CustomCapture implements VideoSink {
 
     private final VideoTrack videoTrack;
-    private EventChannel eventChannel;
-    private EventChannel.EventSink eventSink;
     private final String tag = "CustomCapture";
     private long lastFrameTime = 0;
 
-    public CustomCapture(VideoTrack videoTrack, EventChannel eventChannel) {
+    public CustomCapture(VideoTrack videoTrack) {
         this.videoTrack = videoTrack;
-        this.eventChannel = eventChannel;
-
-        this.eventChannel.setStreamHandler(new EventChannel.StreamHandler() {
-            @Override
-            public void onListen(Object arguments, EventChannel.EventSink events) {
-                eventSink = events;
-            }
-
-            @Override
-            public void onCancel(Object arguments) {
-                eventSink = null;
-            }
-        });
-
         videoTrack.addSink(this);
     }
 
@@ -85,9 +65,7 @@ public class CustomCapture implements VideoSink {
 
 
             Log.i(tag, "onFrame: " + frameData.toString());
-            if (eventSink != null) {
-                eventSink.success(frameData);
-            }
+            // TODO: 메시지 전송
 
             i420Buffer.release();
             videoFrame.release();

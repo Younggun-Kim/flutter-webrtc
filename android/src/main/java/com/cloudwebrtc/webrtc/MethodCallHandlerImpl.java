@@ -809,8 +809,7 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
               customCapture = null;
             }
 
-            EventChannel channel = new EventChannel(messenger, "custom_capture_event");
-            customCapture = new CustomCapture((VideoTrack) videoTrack, channel);
+            customCapture = new CustomCapture((VideoTrack) videoTrack);
           } else {
             resultError("testFrame", "It's not video track", result);
           }
