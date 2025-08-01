@@ -1,7 +1,8 @@
-package com.cloudwebrtc.webrtc;
+package com.cloudwebrtc.webrtc.custom;
 
 import android.util.Log;
 
+import org.greenrobot.eventbus.EventBus;
 import org.webrtc.VideoFrame;
 import org.webrtc.VideoSink;
 import org.webrtc.VideoTrack;
@@ -9,6 +10,7 @@ import org.webrtc.VideoTrack;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
+
 
 public class CustomCapture implements VideoSink {
 
@@ -64,8 +66,9 @@ public class CustomCapture implements VideoSink {
             frameData.put("dataV", vBytes);
 
 
-            Log.i(tag, "onFrame: " + frameData.toString());
-            // TODO: 메시지 전송
+            Log.i(tag, "onFrame: " + frameData);
+            FrameEvent event = new FrameEvent(width, height, yBytes, uBytes, vBytes);
+            EventBus.getDefault().post(event);
 
             i420Buffer.release();
             videoFrame.release();
