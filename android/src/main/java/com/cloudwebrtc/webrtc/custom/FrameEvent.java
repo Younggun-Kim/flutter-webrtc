@@ -24,3 +24,4 @@ public class FrameEvent {
         this.u = u;
         this.v = v;
     }
+}
