@@ -2,6 +2,8 @@ package com.cloudwebrtc.webrtc.custom;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import org.webrtc.VideoFrame;
 import org.webrtc.VideoSink;
 import org.webrtc.VideoTrack;
@@ -60,5 +62,20 @@ public class FrameEvent {
 
     public int getUvRowStride() {
         return uvRowStride;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "FrameEvent{" +
+                "width=" + width +
+                ", height=" + height +
+                ", y.length=" + (y != null ? y.length : "null") +
+                ", u.length=" + (u != null ? u.length : "null") +
+                ", v.length=" + (v != null ? v.length : "null") +
+                ", strideY=" + strideY +
+                ", uvPixelStride=" + uvPixelStride +
+                ", uvRowStride=" + uvRowStride +
+                '}';
     }
 }
