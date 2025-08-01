@@ -11,14 +11,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.flutter.plugin.common.EventChannel;
+import io.flutter.plugin.common.MethodChannel;
+
 
 public class CustomCapture implements VideoSink {
 
-    private final String tag = "CustomCapture";
     private final VideoTrack videoTrack;
+    private MethodChannel methodChannel;
+    private final String tag = "CustomCapture";
     private long lastFrameTime = 0;
 
-    public CustomCapture(VideoTrack videoTrack) {
+    public CustomCapture(VideoTrack videoTrack, MethodChannel channel) {
         this.videoTrack = videoTrack;
 
         videoTrack.addSink(this);
@@ -68,6 +71,7 @@ public class CustomCapture implements VideoSink {
 
             // 예: 이벤트 채널로 전송
             // eventSink.success(frameData);
+            channel.invokeMethod("CustomCaptureEvent", frameData);
 
             i420Buffer.release();
             videoFrame.release();
