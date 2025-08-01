@@ -10,23 +10,28 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.flutter.plugin.common.MethodChannel;
+import io.flutter.plugin.common.EventChannel;
 
 public class CustomCapture implements VideoSink {
 
     private final String tag = "CustomCapture";
     private final VideoTrack videoTrack;
-    private final MethodChannel methodChannel;
+    private long lastFrameTime = 0;
 
-    public CustomCapture(VideoTrack videoTrack, MethodChannel methodChannel) {
+    public CustomCapture(VideoTrack videoTrack) {
         this.videoTrack = videoTrack;
-        this.methodChannel = methodChannel;
 
         videoTrack.addSink(this);
     }
 
     @Override
     public void onFrame(VideoFrame videoFrame) {
+        long now = System.currentTimeMillis();
+        if (now - lastFrameTime < 33) {
+            return; // 30fps 제한
+        }
+        lastFrameTime = now;
+
         try {
             videoFrame.retain();
 
@@ -43,7 +48,6 @@ public class CustomCapture implements VideoSink {
             int strideU = i420Buffer.getStrideU();
             int strideV = i420Buffer.getStrideV();
 
-            // ByteArray로 변환 (Flutter로 넘길 수 있는 타입)
             byte[] yBytes = new byte[y.remaining()];
             byte[] uBytes = new byte[u.remaining()];
             byte[] vBytes = new byte[v.remaining()];
@@ -62,17 +66,16 @@ public class CustomCapture implements VideoSink {
             frameData.put("dataU", uBytes);
             frameData.put("dataV", vBytes);
 
-            methodChannel.invokeMethod("CustomCaptureEvent", frameData);
+            // 예: 이벤트 채널로 전송
+            // eventSink.success(frameData);
 
             i420Buffer.release();
             videoFrame.release();
-
         } catch (Exception e) {
             dispose();
             Log.e(tag, "onFrame Error: ", e);
         }
     }
-
     public void dispose() {
         videoTrack.removeSink(this);
     }

@@ -821,8 +821,10 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
         break;
       }
       case "stopCustomCapture": {
-        customCapture.dispose();
-        customCapture = null;
+        if(customCapture != null) {
+          customCapture.dispose();
+          customCapture = null;
+        }
 
         break;
       }
