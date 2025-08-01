@@ -17,12 +17,13 @@ import io.flutter.plugin.common.MethodChannel;
 public class CustomCapture implements VideoSink {
 
     private final VideoTrack videoTrack;
-    private MethodChannel methodChannel;
+    private MethodChannel channel;
     private final String tag = "CustomCapture";
     private long lastFrameTime = 0;
 
     public CustomCapture(VideoTrack videoTrack, MethodChannel channel) {
         this.videoTrack = videoTrack;
+        this.channel = channel;
 
         videoTrack.addSink(this);
     }
