@@ -26,7 +26,7 @@ public class CustomCapture implements VideoSink {
     @Override
     public void onFrame(VideoFrame videoFrame) {
         long now = System.currentTimeMillis();
-        if (now - lastFrameTime < 33) {
+        if (now - lastFrameTime < 100) {
             return; // 30fps 제한
         }
         lastFrameTime = now;
