@@ -17,13 +17,26 @@ import io.flutter.plugin.common.MethodChannel;
 public class CustomCapture implements VideoSink {
 
     private final VideoTrack videoTrack;
-    private MethodChannel channel;
+    private EventChannel eventChannel;
+    private EventChannel.EventSink eventSink;
     private final String tag = "CustomCapture";
     private long lastFrameTime = 0;
 
-    public CustomCapture(VideoTrack videoTrack, MethodChannel channel) {
+    public CustomCapture(VideoTrack videoTrack, EventChannel eventChannel) {
         this.videoTrack = videoTrack;
-        this.channel = channel;
+        this.eventChannel = eventChannel;
+
+        this.eventChannel.setStreamHandler(new EventChannel.StreamHandler() {
+            @Override
+            public void onListen(Object arguments, EventChannel.EventSink events) {
+                eventSink = events;
+            }
+
+            @Override
+            public void onCancel(Object arguments) {
+                eventSink = null;
+            }
+        });
 
         videoTrack.addSink(this);
     }
@@ -70,9 +83,9 @@ public class CustomCapture implements VideoSink {
             frameData.put("dataU", uBytes);
             frameData.put("dataV", vBytes);
 
-            // 예: 이벤트 채널로 전송
-            // eventSink.success(frameData);
-            channel.invokeMethod("CustomCaptureEvent", frameData);
+            if (eventSink != null) {
+                eventSink.success(frameData);
+            }
 
             i420Buffer.release();
             videoFrame.release();
