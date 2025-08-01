@@ -44,8 +44,8 @@ public class CustomCapture implements VideoSink {
             int width = i420Buffer.getWidth();
             int height = i420Buffer.getHeight();
             int strideY = i420Buffer.getStrideY();
-            int strideU = i420Buffer.getStrideU();
-            int strideV = i420Buffer.getStrideV();
+            int uvRowStride = i420Buffer.getStrideU();
+            int uvPixelStride = 1;
 
             byte[] yBytes = new byte[y.remaining()];
             byte[] uBytes = new byte[u.remaining()];
@@ -59,15 +59,15 @@ public class CustomCapture implements VideoSink {
             frameData.put("width", width);
             frameData.put("height", height);
             frameData.put("strideY", strideY);
-            frameData.put("strideU", strideU);
-            frameData.put("strideV", strideV);
+            frameData.put("uvRowStride", uvRowStride);
+            frameData.put("uvPixelStride", uvPixelStride);
             frameData.put("dataY", yBytes);
             frameData.put("dataU", uBytes);
             frameData.put("dataV", vBytes);
 
 
             Log.i(tag, "onFrame: " + frameData);
-            FrameEvent event = new FrameEvent(width, height, yBytes, uBytes, vBytes);
+            FrameEvent event = new FrameEvent(width, height, yBytes, uBytes, vBytes, strideY, uvPixelStride, uvRowStride);
             EventBus.getDefault().post(event);
 
             i420Buffer.release();
