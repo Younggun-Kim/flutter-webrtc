@@ -83,6 +83,8 @@ public class CustomCapture implements VideoSink {
             frameData.put("dataU", uBytes);
             frameData.put("dataV", vBytes);
 
+
+            Log.i(tag, "onFrame: " + frameData.toString());
             if (eventSink != null) {
                 eventSink.success(frameData);
             }
