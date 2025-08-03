@@ -37,6 +37,10 @@ public class CustomCapture implements VideoSink {
             VideoFrame.Buffer buffer = videoFrame.getBuffer();
             VideoFrame.I420Buffer i420Buffer = buffer.toI420();
 
+            if(i420Buffer == null) {
+                return;
+            }
+
             ByteBuffer y = i420Buffer.getDataY();
             ByteBuffer u = i420Buffer.getDataU();
             ByteBuffer v = i420Buffer.getDataV();
@@ -68,10 +72,11 @@ public class CustomCapture implements VideoSink {
 
             Log.i(tag, "onFrame: " + frameData);
             FrameEvent event = new FrameEvent(width, height, yBytes, uBytes, vBytes, strideY, uvPixelStride, uvRowStride);
-            EventBus.getDefault().post(event);
 
             i420Buffer.release();
             videoFrame.release();
+
+            EventBus.getDefault().post(event);
         } catch (Exception e) {
             dispose();
             Log.e(tag, "onFrame Error: ", e);
