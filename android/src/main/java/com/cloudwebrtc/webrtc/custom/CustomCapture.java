@@ -51,6 +51,17 @@ public class CustomCapture implements VideoSink {
             int uvRowStride = i420Buffer.getStrideU();
             int uvPixelStride = 1;
 
+            int expectedYSize = strideY * height;
+            int expectedUSize = uvRowStride * height / 2;
+            int expectedVSize = uvRowStride * height / 2;
+
+            if (y.remaining() < expectedYSize || u.remaining() < expectedUSize || v.remaining() < expectedVSize) {
+                Log.w(tag, "Invalid YUV buffer size");
+                i420Buffer.release();
+                videoFrame.release();
+                return;
+            }
+
             byte[] yBytes = new byte[y.remaining()];
             byte[] uBytes = new byte[u.remaining()];
             byte[] vBytes = new byte[v.remaining()];
